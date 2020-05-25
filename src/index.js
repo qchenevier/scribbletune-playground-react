@@ -33,4 +33,13 @@ scribble
   })
   .start();
 
+const BPM = 180;
+const clipDuration = "2m";
+
+Tone.Transport.bpm.value = BPM;
 Tone.Transport.start();
+
+setTimeout(
+  () => Tone.Transport.stop(),
+  Tone.Transport.nextSubdivision(clipDuration) * 1000
+);

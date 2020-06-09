@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "scribbletune": "^3.6.1"
+    "scribbletune": "github:qchenevier/scribbletune"
   },
   "devDependencies": {
     "webpack": "^4.43.0",

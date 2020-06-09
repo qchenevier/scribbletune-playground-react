@@ -1,45 +1,41 @@
-// const scribble = require("scribbletune");
 import * as scribble from "scribbletune";
 
-var synth = new Tone.FMSynth({
-  harmonicity: 3,
-  modulationIndex: 10,
-  detune: 0,
+const session = new scribble.Session();
+
+const polySynth = new Tone.PolySynth(5, Tone.Synth, {
   oscillator: {
-    type: "sine",
+    type: "fatsawtooth",
+    count: 5,
+    spread: 20,
   },
   envelope: {
-    attack: 0.01,
-    decay: 0.01,
-    sustain: 1,
-    release: 0.5,
-  },
-  modulation: {
-    type: "square",
-  },
-  modulationEnvelope: {
-    attack: 0.5,
-    decay: 0,
-    sustain: 1,
-    release: 0.5,
+    attack: 0.02,
+    decay: 0.1,
+    sustain: 0.5,
+    release: 0.1,
   },
 });
 
-scribble
-  .clip({
-    instrument: synth,
-    pattern: "xxx[xx]",
-    notes: "C4 D4 C4 D#4 C4 C4 D4 C4 Bb3 C4",
-  })
-  .start();
+const synthChannel = session.createChannel({
+  instrument: polySynth,
+  clips: [
+    {
+      notes: scribble.getChordsByProgression("C3 major", "I II V I I"),
+      pattern: "[x---]".repeat(4) + "x__-",
+    },
+    {
+      notes: scribble.getChordsByProgression("C4 major", "I II V I I"),
+      pattern: "[x---]".repeat(4) + "x__-",
+    },
+  ],
+});
 
-const BPM = 180;
-const clipDuration = "2m";
+session.startRow(0);
+
+const BPM = 140;
 
 Tone.Transport.bpm.value = BPM;
 Tone.Transport.start();
 
-setTimeout(
-  () => Tone.Transport.stop(),
-  Tone.Transport.nextSubdivision(clipDuration) * 1000
-);
+Tone.Transport.schedule((time) => session.startRow(1), "3:3:3");
+Tone.Transport.stop("8:0:0");

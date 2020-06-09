@@ -35,8 +35,42 @@ session.startRow(0);
 const BPM = 120;
 
 Tone.Transport.bpm.value = BPM;
-Tone.Transport.start();
+// Tone.Transport.start();
 
 // Tone.Transport.schedule((time) => session.startRow(1), "3:3:3");
 // Tone.Transport.stop("8:0:0");
-Tone.Transport.stop("4:0:0");
+// Tone.Transport.stop("4:0:0");
+
+import React from "react";
+import ReactDOM from "react-dom";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import Form from "@rjsf/core";
+
+const schema = {
+  title: "Todo",
+  type: "object",
+  required: ["title"],
+  properties: {
+    title: { type: "string", title: "Title", default: "A new task" },
+    done: { type: "boolean", title: "Done?", default: false },
+  },
+};
+
+const log = (type) => console.log.bind(console, type);
+
+const App = () => {
+  return (
+    <div>
+      <div>Voici du react</div>
+      <Form
+        schema={schema}
+        onChange={log("changed")}
+        onSubmit={log("submitted")}
+        onError={log("errors")}
+      />
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.querySelector("#root"));

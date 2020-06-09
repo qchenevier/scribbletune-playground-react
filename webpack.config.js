@@ -16,6 +16,19 @@ module.exports = {
   node: {
     fs: "empty",
   },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/,
+        loader: "style-loader!css-loader",
+      },
+    ],
+  },
   plugins: [
     new HtmlWebpackPlugin({
       hash: true,

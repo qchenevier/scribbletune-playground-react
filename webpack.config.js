@@ -1,4 +1,6 @@
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+// const path = require("path");
 
 module.exports = {
   // mode: "none",
@@ -14,4 +16,12 @@ module.exports = {
   node: {
     fs: "empty",
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      hash: true,
+      title: "Scribbletune playground",
+      template: "./src/index.html",
+      filename: "index.html",
+    }),
+  ],
 };

@@ -1,11 +1,13 @@
 import * as scribble from "scribbletune";
 
-const session = new scribble.Session();
-const synthParams = Tone.PolySynth.defaults;
-const polySynth = new Tone.PolySynth(5, Tone.Synth, synthParams);
+Tone.Master = Tone.Destination;
 
-const synthChannel = session.createChannel({
-  instrument: polySynth,
+const session = new scribble.Session();
+const instrument = new Tone.Synth();
+const instrumentParams = instrument.get();
+
+session.createChannel({
+  instrument: instrument,
   clips: [
     {
       notes: scribble.getChordsByProgression("C3 major", "V V V V I I I I"),
@@ -35,7 +37,7 @@ function forceNumbers(type, schema, value, defaultFunc) {
     return defaultFunc(type, schema, value);
   }
 }
-const schema = toJsonSchema(synthParams.voice.defaults, {
+const schema = toJsonSchema(instrumentParams, {
   postProcessFnc: forceNumbers,
 });
 
@@ -52,9 +54,9 @@ function PlayPause() {
 }
 
 function App() {
-  var [formData, setFormData] = React.useState(synthParams.voice.defaults);
+  var [formData, setFormData] = React.useState(instrumentParams);
   React.useEffect(() => {
-    polySynth.set(formData);
+    instrument.set(formData);
   });
 
   var bpmSchema = { type: "integer", minimum: 0, maximum: 250 };

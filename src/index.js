@@ -1,9 +1,7 @@
 import * as scribble from "scribbletune";
 
 const session = new scribble.Session();
-
 const synthParams = Tone.PolySynth.defaults;
-
 const polySynth = new Tone.PolySynth(5, Tone.Synth, synthParams);
 
 const synthChannel = session.createChannel({
@@ -22,49 +20,38 @@ const synthChannel = session.createChannel({
 
 session.startRow(0);
 
-Tone.Transport.bpm.value = 120;
-
 import React from "react";
 import ReactDOM from "react-dom";
-
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import Form from "@rjsf/core";
-
-import toJsonSchema from "to-json-schema";
 import { Container, Col, Button } from "react-bootstrap";
+import Form from "@rjsf/core";
+import "bootstrap/dist/css/bootstrap.min.css";
+import toJsonSchema from "to-json-schema";
 
-const toJsonOptions = {
-  postProcessFnc: function forceIntegersToBeNumbers(
-    type,
-    schema,
-    value,
-    defaultFunc
-  ) {
-    if (type === "integer" || type === "number") {
-      schema.type = "number";
-      return { ...schema, multipleOf: 0.005 };
-    } else {
-      return defaultFunc(type, schema, value);
-    }
-  },
-};
-const schema = toJsonSchema(synthParams.voice.defaults, toJsonOptions);
+function forceNumbers(type, schema, value, defaultFunc) {
+  if (type === "integer" || type === "number") {
+    schema.type = "number";
+    return { ...schema, multipleOf: 0.005 };
+  } else {
+    return defaultFunc(type, schema, value);
+  }
+}
+const schema = toJsonSchema(synthParams.voice.defaults, {
+  postProcessFnc: forceNumbers,
+});
 
-const PlayPause = () => {
+function PlayPause() {
   var [isPlaying, setIsplaying] = React.useState(false);
   React.useEffect(() => {
     isPlaying ? Tone.Transport.start() : Tone.Transport.stop();
   });
-
   return (
     <Button variant="primary" onClick={() => setIsplaying(!isPlaying)}>
       ▶️ Play
     </Button>
   );
-};
+}
 
-const App = () => {
+function App() {
   var [formData, setFormData] = React.useState(synthParams.voice.defaults);
   React.useEffect(() => {
     polySynth.set(formData);
@@ -92,6 +79,6 @@ const App = () => {
       />
     </Container>
   );
-};
+}
 
 ReactDOM.render(<App />, document.querySelector("#root"));

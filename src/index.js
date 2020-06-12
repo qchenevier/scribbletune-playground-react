@@ -51,32 +51,35 @@ const toJsonOptions = {
 };
 const schema = toJsonSchema(synthParams.voice.defaults, toJsonOptions);
 
-const App = () => {
-  var [isPlaying, togglePlay] = React.useState(true);
-  const playPause = function () {
-    togglePlay(!isPlaying);
-    if (isPlaying) {
-      Tone.Transport.start();
-    } else {
-      Tone.Transport.stop();
-    }
-  };
+const PlayPause = () => {
+  var [isPlaying, setIsplaying] = React.useState(false);
+  React.useEffect(() => {
+    isPlaying ? Tone.Transport.start() : Tone.Transport.stop();
+  });
 
+  return (
+    <Button variant="primary" onClick={() => setIsplaying(!isPlaying)}>
+      ▶️ Play
+    </Button>
+  );
+};
+
+const App = () => {
   var [formData, setFormData] = React.useState(synthParams.voice.defaults);
+  React.useEffect(() => {
+    polySynth.set(formData);
+  });
+
   var bpmSchema = { type: "integer", minimum: 0, maximum: 250 };
   var [bpm, setBpm] = React.useState(Tone.Transport.bpm.value);
-
   React.useEffect(() => {
     Tone.Transport.bpm.value = bpm;
-    polySynth.set(formData);
   });
 
   return (
     <Container fluid="sm">
       <div>Schema</div>
-      <Button variant="primary" onClick={playPause}>
-        ▶️ Play
-      </Button>
+      <PlayPause />
       <Form
         schema={bpmSchema}
         formData={bpm}

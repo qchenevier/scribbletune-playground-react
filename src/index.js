@@ -63,21 +63,13 @@ const App = () => {
   };
 
   var [formData, setFormData] = React.useState(synthParams.voice.defaults);
-  const setSynth = function (e) {
-    setFormData(e.formData);
-    polySynth.set(formData);
-  };
-
-  var bpmSchema = { type: "number" };
+  var bpmSchema = { type: "integer", minimum: 0, maximum: 250 };
   var [bpm, setBpm] = React.useState(Tone.Transport.bpm.value);
-  const setToneBpm = function (e) {
-    setBpm(e.formData);
-    Tone.Transport.bpm.value = bpm;
-  };
 
-  // const uiSchema = {
-  //   envelope: { attack: { "ui.widget": "range" } },
-  // };
+  React.useEffect(() => {
+    Tone.Transport.bpm.value = bpm;
+    polySynth.set(formData);
+  });
 
   return (
     <Container fluid="sm">
@@ -85,12 +77,15 @@ const App = () => {
       <Button variant="primary" onClick={playPause}>
         ▶️ Play
       </Button>
-      <Form schema={bpmSchema} formData={bpm} onSubmit={setToneBpm} />
+      <Form
+        schema={bpmSchema}
+        formData={bpm}
+        onSubmit={(e) => setBpm(e.formData)}
+      />
       <Form
         schema={schema}
         formData={formData}
-        // uiSchema={uiSchema}
-        onSubmit={setSynth}
+        onSubmit={(e) => setFormData(e.formData)}
       />
     </Container>
   );

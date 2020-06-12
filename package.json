@@ -20,7 +20,7 @@
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
-    "scribbletune": "github:qchenevier/scribbletune",
+    "scribbletune": "^3.7.0",
     "to-json-schema": "^0.2.5"
   },
   "devDependencies": {

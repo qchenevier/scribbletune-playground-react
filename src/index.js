@@ -33,6 +33,8 @@ function forceNumbers(type, schema, value, defaultFunc) {
   if (type === "integer" || type === "number") {
     schema.type = "number";
     return { ...schema, multipleOf: 0.005 };
+  } else if (type === "array") {
+    return { ...schema, items: { type: "number" } };
   } else {
     return defaultFunc(type, schema, value);
   }
@@ -59,7 +61,7 @@ function App() {
     instrument.set(formData);
   });
 
-  var bpmSchema = { type: "integer", minimum: 0, maximum: 250 };
+  var bpmSchema = { type: "integer", minimum: 0, maximum: 250, title: "BPM" };
   var [bpm, setBpm] = React.useState(Tone.Transport.bpm.value);
   React.useEffect(() => {
     Tone.Transport.bpm.value = bpm;

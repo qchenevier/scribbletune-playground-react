@@ -88,14 +88,18 @@ function InstrumentParams(props) {
   var [instrumentParams, setInstrumentParams] = React.useState(
     props.instrumentParams
   );
-  var instrumentParamsSchema = computeSchema(instrumentParams);
+  var [instrumentParamsSchema, setInstrumentParamsSchema] = React.useState(
+    computeSchema(instrumentParams)
+  );
+
   React.useEffect(() => {
-    instrumentParamsSchema = computeSchema(instrumentParams);
+    console.log("instrumentParams", instrumentParams);
     props.onSubmit(instrumentParams);
   }, [instrumentParams]);
 
   React.useEffect(() => {
     setInstrumentParams(props.instrumentParams);
+    setInstrumentParamsSchema(computeSchema(props.instrumentParams));
   }, [props.instrumentParams]);
 
   return (
@@ -115,8 +119,9 @@ function Instrument(props) {
   );
 
   React.useEffect(() => {
-    setInstrument(new Tone[instrumentName]());
-    setInstrumentParams(instrument.get());
+    let newInstrument = new Tone[instrumentName]();
+    setInstrument(newInstrument);
+    setInstrumentParams(newInstrument.get());
   }, [instrumentName]);
 
   React.useEffect(() => {
@@ -125,6 +130,7 @@ function Instrument(props) {
   }, [instrument]);
 
   React.useEffect(() => {
+    console.log("parent updates instrument object params", instrumentParams);
     instrument.set(instrumentParams);
   }, [instrumentParams]);
 

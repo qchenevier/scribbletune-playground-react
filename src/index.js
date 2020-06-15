@@ -6,6 +6,7 @@ import { Container, Col, Button } from "react-bootstrap";
 import Form from "@rjsf/core";
 import "bootstrap/dist/css/bootstrap.min.css";
 import toJsonSchema from "to-json-schema";
+import useDeepCompareEffect from "use-deep-compare-effect";
 
 Tone.Master = Tone.Destination; // hack to use tone 14 with scribbletune
 
@@ -23,10 +24,12 @@ const instrumentNames = [
   "Synth",
 ];
 
+const session = new scribble.Session();
+
 function processSchema(type, schema, value, defaultFunc) {
   if (type === "integer" || type === "number") {
     schema.type = "number";
-    return { ...schema, multipleOf: 0.005 };
+    return { ...schema };
   } else if (type === "array") {
     return { ...schema, items: { type: "number" } };
   } else {
@@ -61,9 +64,11 @@ function computeSchema(instrumentParams) {
   });
 }
 
-function createSession(instrument) {
-  const session = new scribble.Session();
-  session.createChannel({
+function createChannel(session, instrument) {
+  session.sessionChannels.length = 0;
+  Tone.Transport.cancel();
+  const channel = session.createChannel({
+    idx: 0,
     instrument: instrument,
     clips: [
       {
@@ -76,7 +81,7 @@ function createSession(instrument) {
       },
     ],
   });
-  return session;
+  return channel;
 }
 
 function InstrumentParams(props) {
@@ -102,23 +107,25 @@ function InstrumentParams(props) {
   );
 }
 
-function Instrument() {
+function Instrument(props) {
   var [instrumentName, setInstrumentName] = React.useState("Synth");
-  var instrument = new Tone[instrumentName]();
+  var [instrument, setInstrument] = React.useState(new Tone[instrumentName]());
   var [instrumentParams, setInstrumentParams] = React.useState(
     instrument.get()
   );
 
   React.useEffect(() => {
-    instrument = new Tone[instrumentName]();
-    const session = createSession(instrument);
+    setInstrument(new Tone[instrumentName]());
     setInstrumentParams(instrument.get());
   }, [instrumentName]);
 
   React.useEffect(() => {
-    if (instrumentParams) {
-      instrument.set(instrumentParams);
-    }
+    const channel = createChannel(props.session, instrument);
+    props.session.startRow(0);
+  }, [instrument]);
+
+  React.useEffect(() => {
+    instrument.set(instrumentParams);
   }, [instrumentParams]);
 
   return (
@@ -168,7 +175,7 @@ function App() {
       <div>Schema</div>
       <PlayPause />
       <BPM />
-      <Instrument />
+      <Instrument session={session} />
     </Container>
   );
 }

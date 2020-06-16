@@ -32,6 +32,9 @@ function processSchema(type, schema, value, defaultFunc) {
     return { ...schema };
   } else if (type === "array") {
     return { ...schema, items: { type: "number" } };
+  } else if (schema.format && schema.format === "color") {
+    var { format, ...schema } = schema;
+    return defaultFunc(type, schema, value);
   } else {
     return defaultFunc(type, schema, value);
   }
@@ -72,12 +75,8 @@ function createChannel(session, instrument) {
     instrument: instrument,
     clips: [
       {
-        notes: scribble.getChordsByProgression("C3 major", "V V V V I I I I"),
-        pattern: "[x---][x---][x---][x---]xxxx",
-      },
-      {
-        notes: scribble.getChordsByProgression("C4 major", "I II V I I"),
-        pattern: "[x---]".repeat(4) + "x__-",
+        notes: "CM-3 ".repeat(4) + "DM7-3 ".repeat(4) + "GM-2 ".repeat(4),
+        pattern: "[xx__]".repeat(12),
       },
     ],
   });
@@ -91,10 +90,15 @@ function InstrumentParams(props) {
   var [instrumentParamsSchema, setInstrumentParamsSchema] = React.useState(
     computeSchema(props.instrumentParams)
   );
+  function randomInt() {
+    return Math.floor(Math.random() * 1e12);
+  }
+  var [key, setKey] = React.useState(randomInt());
 
   React.useEffect(() => {
     setInstrumentParams(props.instrumentParams);
     setInstrumentParamsSchema(computeSchema(props.instrumentParams));
+    setKey(randomInt());
   }, [props.instrumentParams]);
 
   React.useEffect(() => {
@@ -103,6 +107,7 @@ function InstrumentParams(props) {
 
   return (
     <Form
+      key={key}
       schema={instrumentParamsSchema}
       formData={instrumentParams}
       onSubmit={(e) => setInstrumentParams(e.formData)}
